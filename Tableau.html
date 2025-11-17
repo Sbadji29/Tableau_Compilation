@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestionnaire de Tableaux</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .card h2 {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 10px;
+      }
+
+      .menu-btn {
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 10px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+      }
+
+      .menu-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .menu-btn:active {
+        transform: translateY(0);
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+        font-weight: 600;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border 0.3s;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .btn-action {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #667eea;
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin-right: 10px;
+      }
+
+      .btn-action:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+      }
+
+      .btn-cancel {
+        background: #e74c3c;
+      }
+
+      .btn-cancel:hover {
+        background: #c0392b;
+      }
+
+      .arrays-display {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .array-item {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+      }
+
+      .array-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .array-header {
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+
+      .array-values {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .value-badge {
+        background: #667eea;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+      }
+
+      .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+
+      .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .alert-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+
+      @media (max-width: 768px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .elements-input-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Gestionnaire de Tableaux</h1>
+        <p>Interface graphique pour la manipulation de tableaux d'entiers</p>
+      </div>
+
+      <div class="main-grid">
+        <div class="card">
+          <h2>Menu Principal</h2>
+          <button class="menu-btn" onclick="showCreateArray()">
+            Créer un nouveau tableau
+          </button>
+          <button class="menu-btn" onclick="showDisplayArray()">
+            Afficher un tableau
+          </button>
+          <button class="menu-btn" onclick="displayAllArrays()">
+            Afficher tous les tableaux
+          </button>
+          <button class="menu-btn" onclick="showInsertElement()">
+            Insérer un élément
+          </button>
+          <button class="menu-btn" onclick="showDeleteElement()">
+            Supprimer un élément
+          </button>
+          <button class="menu-btn" onclick="showIntersection()">
+            Intersection de tableaux
+          </button>
+          <button class="menu-btn" onclick="showFusion()">
+            Fusion de tableaux
+          </button>
+        </div>
+
+        <div class="arrays-display" id="arraysDisplay">
+          <h2 style="color: #667eea; margin-bottom: 20px">Vos Tableaux</h2>
+          <div id="arraysList">
+            <p style="text-align: center; color: #999; padding: 50px">
+              Aucun tableau créé. Commencez par créer un nouveau tableau !
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour créer un tableau -->
+    <div class="modal" id="createArrayModal">
+      <div class="modal-content">
+        <h3 class="modal-header">Créer un nouveau tableau</h3>
+        <div class="input-group">
+          <label>Nombre d'éléments (1-100):</label>
+          <input
+            type="number"
+            id="arraySize"
+            min="1"
+            max="100"
+            placeholder="Ex: 5"
+          />
+        </div>
+        <div id="elementsContainer"></div>
+        <div style="margin-top: 20px">
+          <button class="btn-action" onclick="generateInputs()">
+            Générer les champs
+          </button>
+          <button class="btn-action" onclick="createArray()">Créer</button>
+          <button
+            class="btn-action btn-cancel"
+            onclick="closeModal('createArrayModal')"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour afficher un tableau -->
+    <div class="modal" id="displayArrayModal">
+      <div class="modal-content">
+        <h3 class="modal-header">Afficher un tableau</h3>
+        <div class="input-group">
+          <label>Numéro du tableau:</label>
+          <input type="number" id="displayArrayNum" min="1" />
+        </div>
+        <div id="displayResult"></div>
+        <div style="margin-top: 20px">
+          <button class="btn-action" onclick="displaySingleArray()">
+            Afficher
+          </button>
+          <button
+            class="btn-action btn-cancel"
+            onclick="closeModal('displayArrayModal')"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour insérer un élément -->
+    <div class="modal" id="insertModal">
+      <div class="modal-content">
+        <h3 class="modal-header">Insérer un élément</h3>
+        <div class="input-group">
+          <label>Numéro du tableau:</label>
+          <input type="number" id="insertArrayNum" min="1" />
+        </div>
+        <div class="input-group">
+          <label>Position d'insertion:</label>
+          <input type="number" id="insertPosition" min="1" />
+        </div>
+        <div class="input-group">
+          <label>Valeur à insérer:</label>
+          <input type="number" id="insertValue" />
+        </div>
+        <div style="margin-top: 20px">
+          <button class="btn-action" onclick="insertElement()">Insérer</button>
+          <button
+            class="btn-action btn-cancel"
+            onclick="closeModal('insertModal')"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour supprimer un élément -->
+    <div class="modal" id="deleteModal">
+      <div class="modal-content">
+        <h3 class="modal-header">Supprimer un élément</h3>
+        <div class="input-group">
+          <label>Numéro du tableau:</label>
+          <input type="number" id="deleteArrayNum" min="1" />
+        </div>
+        <div class="input-group">
+          <label>Position à supprimer:</label>
+          <input type="number" id="deletePosition" min="1" />
+        </div>
+        <div style="margin-top: 20px">
+          <button class="btn-action" onclick="deleteElement()">
+            Supprimer
+          </button>
+          <button
+            class="btn-action btn-cancel"
+            onclick="closeModal('deleteModal')"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour intersection -->
+    <div class="modal" id="intersectionModal">
+      <div class="modal-content">
+        <h3 class="modal-header">Intersection de tableaux</h3>
+        <div class="input-group">
+          <label>Numéro du premier tableau:</label>
+          <input type="number" id="intersectArray1" min="1" />
+        </div>
+        <div class="input-group">
+          <label>Numéro du deuxième tableau:</label>
+          <input type="number" id="intersectArray2" min="1" />
+        </div>
+        <div id="intersectionResult"></div>
+        <div style="margin-top: 20px">
+          <button class="btn-action" onclick="calculateIntersection()">
+            Calculer
+          </button>
+          <button
+            class="btn-action btn-cancel"
+            onclick="closeModal('intersectionModal')"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour fusion -->
+    <div class="modal" id="fusionModal">
+      <div class="modal-content">
+        <h3 class="modal-header">Fusion de tableaux</h3>
+        <div class="input-group">
+          <label>Numéro du premier tableau:</label>
+          <input type="number" id="fusionArray1" min="1" />
+        </div>
+        <div class="input-group">
+          <label>Numéro du deuxième tableau:</label>
+          <input type="number" id="fusionArray2" min="1" />
+        </div>
+        <div style="margin-top: 20px">
+          <button class="btn-action" onclick="fusionArrays()">Fusionner</button>
+          <button
+            class="btn-action btn-cancel"
+            onclick="closeModal('fusionModal')"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const MAX_COLS = 100;
+      let arrays = [];
+
+      function showAlert(message, type = "info") {
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.textContent = message;
+        alertDiv.style.position = "fixed";
+        alertDiv.style.top = "20px";
+        alertDiv.style.right = "20px";
+        alertDiv.style.zIndex = "2000";
+        alertDiv.style.minWidth = "300px";
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000);
+      }
+
+      function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove("active");
+      }
+
+      function showCreateArray() {
+        document.getElementById("createArrayModal").classList.add("active");
+        document.getElementById("elementsContainer").innerHTML = "";
+      }
+
+      function generateInputs() {
+        const size = parseInt(document.getElementById("arraySize").value);
+        if (isNaN(size) || size < 1 || size > MAX_COLS) {
+          showAlert("Veuillez entrer un nombre entre 1 et 100", "error");
+          return;
+        }
+
+        const container = document.getElementById("elementsContainer");
+        container.innerHTML =
+          '<div class="input-group"><label>Entrez les éléments:</label></div>';
+        const inputsContainer = document.createElement("div");
+        inputsContainer.className = "elements-input-container";
+
+        for (let i = 0; i < size; i++) {
+          const input = document.createElement("input");
+          input.type = "number";
+          input.id = `elem_${i}`;
+          input.placeholder = `#${i + 1}`;
+          input.style.padding = "8px";
+          input.style.textAlign = "center";
+          inputsContainer.appendChild(input);
+        }
+        container.appendChild(inputsContainer);
+      }
+
+      function createArray() {
+        const size = parseInt(document.getElementById("arraySize").value);
+        if (isNaN(size) || size < 1 || size > MAX_COLS) {
+          showAlert("Nombre d'éléments invalide", "error");
+          return;
+        }
+
+        const newArray = [];
+        for (let i = 0; i < size; i++) {
+          const value = parseInt(document.getElementById(`elem_${i}`).value);
+          if (isNaN(value)) {
+            showAlert(
+              `Veuillez remplir tous les champs (élément ${i + 1})`,
+              "error"
+            );
+            return;
+          }
+          newArray.push(value);
+        }
+
+        arrays.push(newArray);
+        showAlert(`Tableau ${arrays.length} créé avec succès!`, "success");
+        closeModal("createArrayModal");
+        displayAllArrays();
+      }
+
+      function displayAllArrays() {
+        const arraysList = document.getElementById("arraysList");
+        if (arrays.length === 0) {
+          arraysList.innerHTML =
+            '<p style="text-align: center; color: #999; padding: 50px;">Aucun tableau créé.</p>';
+          return;
+        }
+
+        arraysList.innerHTML = "";
+        arrays.forEach((arr, index) => {
+          const arrayDiv = document.createElement("div");
+          arrayDiv.className = "array-item";
+          arrayDiv.innerHTML = `
+                    <div class="array-header">Tableau ${index + 1} [${
+            arr.length
+          } éléments]</div>
+                    <div class="array-values">
+                        ${arr
+                          .map(
+                            (val) => `<span class="value-badge">${val}</span>`
+                          )
+                          .join("")}
+                    </div>
+                `;
+          arraysList.appendChild(arrayDiv);
+        });
+      }
+
+      function showDisplayArray() {
+        if (arrays.length === 0) {
+          showAlert("Aucun tableau disponible", "error");
+          return;
+        }
+        document.getElementById("displayArrayModal").classList.add("active");
+        document.getElementById("displayResult").innerHTML = "";
+      }
+
+      function displaySingleArray() {
+        const num =
+          parseInt(document.getElementById("displayArrayNum").value) - 1;
+        const resultDiv = document.getElementById("displayResult");
+
+        if (num < 0 || num >= arrays.length) {
+          resultDiv.innerHTML =
+            '<div class="alert alert-error">Numéro de tableau invalide</div>';
+          return;
+        }
+
+        resultDiv.innerHTML = `
+                <div class="array-item">
+                    <div class="array-header">Tableau ${num + 1} [${
+          arrays[num].length
+        } éléments]</div>
+                    <div class="array-values">
+                        ${arrays[num]
+                          .map(
+                            (val) => `<span class="value-badge">${val}</span>`
+                          )
+                          .join("")}
+                    </div>
+                </div>
+            `;
+      }
+
+      function showInsertElement() {
+        if (arrays.length === 0) {
+          showAlert("Aucun tableau disponible", "error");
+          return;
+        }
+        document.getElementById("insertModal").classList.add("active");
+      }
+
+      function insertElement() {
+        const num =
+          parseInt(document.getElementById("insertArrayNum").value) - 1;
+        const pos =
+          parseInt(document.getElementById("insertPosition").value) - 1;
+        const value = parseInt(document.getElementById("insertValue").value);
+
+        if (num < 0 || num >= arrays.length) {
+          showAlert("Numéro de tableau invalide", "error");
+          return;
+        }
+
+        if (arrays[num].length >= MAX_COLS) {
+          showAlert("Tableau plein", "error");
+          return;
+        }
+
+        if (pos < 0 || pos > arrays[num].length) {
+          showAlert("Position invalide", "error");
+          return;
+        }
+
+        if (isNaN(value)) {
+          showAlert("Valeur invalide", "error");
+          return;
+        }
+
+        arrays[num].splice(pos, 0, value);
+        showAlert("Élément inséré avec succès", "success");
+        closeModal("insertModal");
+        displayAllArrays();
+      }
+
+      function showDeleteElement() {
+        if (arrays.length === 0) {
+          showAlert("Aucun tableau disponible", "error");
+          return;
+        }
+        document.getElementById("deleteModal").classList.add("active");
+      }
+
+      function deleteElement() {
+        const num =
+          parseInt(document.getElementById("deleteArrayNum").value) - 1;
+        const pos =
+          parseInt(document.getElementById("deletePosition").value) - 1;
+
+        if (num < 0 || num >= arrays.length) {
+          showAlert("Numéro de tableau invalide", "error");
+          return;
+        }
+
+        if (arrays[num].length === 0) {
+          showAlert("Tableau vide", "error");
+          return;
+        }
+
+        if (pos < 0 || pos >= arrays[num].length) {
+          showAlert("Position invalide", "error");
+          return;
+        }
+
+        arrays[num].splice(pos, 1);
+        showAlert("Élément supprimé avec succès", "success");
+        closeModal("deleteModal");
+        displayAllArrays();
+      }
+
+      function showIntersection() {
+        if (arrays.length < 2) {
+          showAlert("Il faut au moins 2 tableaux", "error");
+          return;
+        }
+        document.getElementById("intersectionModal").classList.add("active");
+        document.getElementById("intersectionResult").innerHTML = "";
+      }
+
+      function calculateIntersection() {
+        const num1 =
+          parseInt(document.getElementById("intersectArray1").value) - 1;
+        const num2 =
+          parseInt(document.getElementById("intersectArray2").value) - 1;
+        const resultDiv = document.getElementById("intersectionResult");
+
+        if (
+          num1 < 0 ||
+          num1 >= arrays.length ||
+          num2 < 0 ||
+          num2 >= arrays.length
+        ) {
+          resultDiv.innerHTML =
+            '<div class="alert alert-error">Numéro de tableau invalide</div>';
+          return;
+        }
+
+        const intersection = arrays[num1].filter((value) =>
+          arrays[num2].includes(value)
+        );
+        const uniqueIntersection = [...new Set(intersection)];
+
+        if (uniqueIntersection.length === 0) {
+          resultDiv.innerHTML =
+            '<div class="alert alert-info">Aucun élément commun</div>';
+        } else {
+          resultDiv.innerHTML = `
+                    <div class="array-item">
+                        <div class="array-header">Intersection [${
+                          uniqueIntersection.length
+                        } éléments]</div>
+                        <div class="array-values">
+                            ${uniqueIntersection
+                              .map(
+                                (val) =>
+                                  `<span class="value-badge">${val}</span>`
+                              )
+                              .join("")}
+                        </div>
+                    </div>
+                `;
+        }
+      }
+
+      function showFusion() {
+        if (arrays.length < 2) {
+          showAlert("Il faut au moins 2 tableaux", "error");
+          return;
+        }
+        document.getElementById("fusionModal").classList.add("active");
+      }
+
+      function fusionArrays() {
+        const num1 =
+          parseInt(document.getElementById("fusionArray1").value) - 1;
+        const num2 =
+          parseInt(document.getElementById("fusionArray2").value) - 1;
+
+        if (
+          num1 < 0 ||
+          num1 >= arrays.length ||
+          num2 < 0 ||
+          num2 >= arrays.length
+        ) {
+          showAlert("Numéro de tableau invalide", "error");
+          return;
+        }
+
+        if (arrays[num1].length + arrays[num2].length > MAX_COLS) {
+          showAlert("Fusion impossible (dépassement de capacité)", "error");
+          return;
+        }
+
+        const fusedArray = [...arrays[num1], ...arrays[num2]];
+        arrays.push(fusedArray);
+        showAlert(
+          `Fusion réalisée! Nouveau tableau ${arrays.length} créé`,
+          "success"
+        );
+        closeModal("fusionModal");
+        displayAllArrays();
+      }
+
+      // Fermer les modals en cliquant à l'extérieur
+      document.querySelectorAll(".modal").forEach((modal) => {
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) {
+            modal.classList.remove("active");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
